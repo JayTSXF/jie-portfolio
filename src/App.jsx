@@ -9,7 +9,6 @@ export default function Portfolio() {
   useEffect(() => {
     const generateBubbles = () => {
       const newBubbles = [];
-      // 只生成10个泡泡，避免聚集
       for (let i = 0; i < 10; i++) {
         const isLeft = i % 2 === 0;
         const left = isLeft 
@@ -19,7 +18,6 @@ export default function Portfolio() {
         newBubbles.push({
           id: i,
           left: left,
-          // 每个泡泡间隔3秒，加上i*20秒让它们初始就分散开
           delay: -20 + (i * 3)
         });
       }
@@ -141,7 +139,7 @@ export default function Portfolio() {
             <a href="https://github.com/JayTSXF" target="_blank" rel="noopener noreferrer" className="hover:text-blue-300 transition-colors">
               <Github size={24} />
             </a>
-            <a href="/resume.pdf" target="_blank" className="hover:text-blue-300 transition-colors">
+            <a href="/jie-portfolio/public/resume.pdf" target="_blank" className="hover:text-blue-300 transition-colors">
               <FileText size={24} />
             </a>
           </div>
@@ -166,8 +164,12 @@ export default function Portfolio() {
               </p>
             </div>
             <div className="flex justify-center">
-              <div className="w-80 h-80 rounded-full border-4 border-white bg-gradient-to-br from-cyan-400 to-blue-500 flex items-center justify-center text-8xl font-bold shadow-2xl">
-                JH
+              <div className="w-80 h-80 rounded-full border-4 border-white overflow-hidden shadow-2xl">
+                <img 
+                  src={`${import.meta.env.BASE_URL}profile.jpg`}
+                  alt="Jie Huang Profile" 
+                  className="w-full h-full object-cover"
+                />
               </div>
             </div>
           </div>
