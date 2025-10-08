@@ -139,7 +139,7 @@ export default function Portfolio() {
             <a href="https://github.com/JayTSXF" target="_blank" rel="noopener noreferrer" className="hover:text-blue-300 transition-colors">
               <Github size={24} />
             </a>
-            <a href="/jie-portfolio/public/resume.pdf" target="_blank" className="hover:text-blue-300 transition-colors">
+            <a href={`${import.meta.env.BASE_URL}resume.pdf`} target="_blank" className="hover:text-blue-300 transition-colors">
               <FileText size={24} />
             </a>
           </div>
