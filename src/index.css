@@ -10,6 +10,22 @@
 
 html {
   scroll-behavior: smooth;
+  /* The header is fixed, so anchor jumps would otherwise land under it. */
+  scroll-padding-top: 5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 body {
@@ -17,8 +33,10 @@ body {
   color: #ffffff;
 }
 
+/* Scrollbar styling lives here only. The old build also had a duplicate,
+   conflicting copy inside a <style> tag in App.jsx, which silently won. */
 ::-webkit-scrollbar {
-  width: 10px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -26,16 +44,15 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(34, 211, 238, 0.6);
-  border-radius: 5px;
-  border: 2px solid transparent;
+  background: rgba(34, 211, 238, 0.5);
+  border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(34, 211, 238, 0.9);
+  background: rgba(34, 211, 238, 0.8);
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: rgba(34, 211, 238, 0.6) rgba(6, 10, 20, 0.8);
+  scrollbar-color: rgba(34, 211, 238, 0.5) rgba(6, 10, 20, 0.8);
 }
