@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Github, Linkedin, FileText, ExternalLink, Mail } from 'lucide-react';
-import emailjs from '@emailjs/browser';
 
 /* ------------------------------------------------------------------ */
 /*  Config                                                             */
@@ -10,77 +9,41 @@ const EMAIL = 'jhuang09@villanova.edu';
 const LINKEDIN = 'https://www.linkedin.com/in/jie-huang-nb';
 const GITHUB = 'https://github.com/JayTSXF';
 
-// EmailJS keys are public by design (they are visible in any browser build).
-// The real protection is the domain allowlist in your EmailJS dashboard:
-// Account -> Security -> "Allowed origins". Add jaytsxf.github.io there.
-const EMAILJS = {
-  serviceId: 'service_8tq8xjl',
-  templateId: 'template_gz4s5ue',
-  publicKey: 'uvWiNhqJbdHLFIU5T',
-};
+const BASE = import.meta.env.BASE_URL;
+// Icons are served from public/icons/ instead of a CDN, so the skills grid
+// can't break if jsDelivr is blocked or down.
+const icon = (name) => `${BASE}icons/${name}.svg`;
 
-const DEVICON = 'https://cdn.jsdelivr.net/gh/devicons/devicon/icons';
-
-const SKILL_GROUPS = [
-  {
-    label: 'Languages',
-    items: [
-      { name: 'Python', icon: `${DEVICON}/python/python-original.svg` },
-      { name: 'R', icon: `${DEVICON}/r/r-original.svg` },
-      { name: 'SQL', icon: `${DEVICON}/mysql/mysql-original.svg` },
-      { name: 'Java', icon: `${DEVICON}/java/java-original.svg` },
-      { name: 'C', icon: `${DEVICON}/c/c-original.svg` },
-      { name: 'C#', icon: `${DEVICON}/csharp/csharp-original.svg` },
-      { name: 'JavaScript', icon: `${DEVICON}/javascript/javascript-original.svg` },
-      { name: 'HTML', icon: `${DEVICON}/html5/html5-original.svg` },
-      { name: 'CSS', icon: `${DEVICON}/css3/css3-original.svg` },
-    ],
-  },
-  {
-    label: 'Frameworks & Runtime',
-    items: [
-      { name: 'React', icon: `${DEVICON}/react/react-original.svg` },
-      { name: 'Node.js', icon: `${DEVICON}/nodejs/nodejs-original.svg` },
-    ],
-  },
-  {
-    label: 'Data & Cloud',
-    items: [
-      { name: 'MongoDB', icon: `${DEVICON}/mongodb/mongodb-original.svg` },
-      { name: 'Firebase', icon: `${DEVICON}/firebase/firebase-plain.svg` },
-      { name: 'Supabase', icon: `${DEVICON}/supabase/supabase-original.svg` },
-      { name: 'AWS', icon: `${DEVICON}/amazonwebservices/amazonwebservices-original-wordmark.svg` },
-    ],
-  },
-  {
-    label: 'Platforms & Tools',
-    items: [
-      { name: 'Salesforce', icon: `${DEVICON}/salesforce/salesforce-original.svg` },
-      { name: 'Airtable', icon: null }, // no devicon asset -> text tile
-      { name: 'Zapier', icon: null }, // no devicon asset -> text tile
-      { name: 'RStudio', icon: `${DEVICON}/rstudio/rstudio-original.svg` },
-      { name: 'VS Code', icon: `${DEVICON}/vscode/vscode-original.svg` },
-      { name: 'Git', icon: `${DEVICON}/git/git-original.svg` },
-      { name: 'Linux', icon: `${DEVICON}/linux/linux-original.svg` },
-      { name: 'Excel', icon: null },
-    ],
-  },
+const SKILLS = [
+  { name: 'Python', icon: icon('python') },
+  { name: 'Java', icon: icon('java') },
+  { name: 'C', icon: icon('c') },
+  { name: 'SQL', icon: icon('sql') },
+  { name: 'JavaScript', icon: icon('javascript') },
+  { name: 'R', icon: icon('r') },
+  { name: 'RStudio', icon: icon('rstudio') },
+  { name: 'Excel', icon: icon('excel') },
+  { name: 'Visual Studio Code', icon: icon('vscode') },
 ];
 
 const EDUCATION = [
   {
     school: 'Villanova University',
-    degree: 'M.S. Applied Statistics and Data Science',
+    degree: 'Master of Science',
+    // One program with one name — joined with "and", never split by "&".
+    majorLabel: 'Major',
+    majors: 'Applied Statistics and Data Science',
     location: 'Villanova, PA',
     period: 'Expected May 2028',
-    note: 'In progress',
   },
   {
     school: 'Temple University',
-    degree: 'B.S. Computer Science and Data Science',
+    degree: 'Bachelor of Science',
+    // Two separate majors — comma-separated.
+    majorLabel: 'Majors',
+    majors: 'Computer Science, Data Science',
     location: 'Philadelphia, PA',
     period: 'May 2025',
-    note: 'GPA 3.52',
   },
 ];
 
@@ -90,6 +53,7 @@ const EXPERIENCES = [
     title: 'Technologist in Residence',
     company: 'Philly AI Lab',
     location: 'Philadelphia, PA',
+    link: 'https://www.linkedin.com/posts/phillytech-ai-buildinpublic-share-7483390707982893057-wT3h/',
     points: [
       'Built a full-stack AI CRM that captures contacts from voice, images, PDFs, and QR codes',
       'Developed AI search across 5,000+ contacts using keyword retrieval with LLM reranking',
@@ -102,7 +66,6 @@ const EXPERIENCES = [
     title: 'IT Intern',
     company: 'The Welcoming Center for New Pennsylvanians',
     location: 'Philadelphia, PA',
-    link: 'https://www.linkedin.com/posts/jie-huang-nb_last-week-i-finished-my-internship-at-the-activity-7232550885933957120-nPaW',
     points: [
       'Extracted 100+ survey and 400+ collector records from SurveyMonkey via Python and Zapier',
       'Structured Salesforce objects and tables to organize survey data through API integration',
@@ -142,7 +105,7 @@ const PROJECTS = [
     title: 'Massachusetts Health Care Access Analysis',
     type: 'Independent Research',
     location: 'Philadelphia, PA',
-    link: null, // TODO: add a GitHub repo or write-up link when available
+    link: 'https://github.com/JayTSXF/ma-language-access',
     points: [
       'Analyzed 457 Massachusetts ZCTAs in R to evaluate language barriers and healthcare access',
       'Combined CDC and ACS datasets through APIs while resolving Census data anomalies',
@@ -184,10 +147,10 @@ const PROJECTS = [
     link: 'https://grinddaily.onrender.com/',
     points: [
       'Designed the MongoDB schema behind user data storage and retrieval for the whole application',
-      'Built the "Forgot Password" flow with EmailJS to automate verification and password resets',
+      'Built the "Forgot Password" flow to automate email verification and password resets',
       'Implemented the "Friend" feature backend in Node.js for requests, accepts, declines, and lookups',
     ],
-    tags: ['React', 'Node.js', 'MongoDB', 'JavaScript', 'EmailJS'],
+    tags: ['React', 'Node.js', 'MongoDB', 'JavaScript'],
   },
   {
     period: 'Jan 2024 – May 2024',
@@ -210,7 +173,6 @@ const NAV = [
   { href: '#skills', label: 'Skills' },
   { href: '#experience', label: 'Experience' },
   { href: '#projects', label: 'Projects' },
-  { href: '#contact', label: 'Contact' },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -249,7 +211,6 @@ function useCurveCanvas(canvasRef) {
     let elapsed = 0;
     let phase = 'drawing';
     let curveIndex = 0;
-    let points = generatePoints(CURVES[0].fn);
 
     function generatePoints(fn) {
       const out = [];
@@ -260,9 +221,11 @@ function useCurveCanvas(canvasRef) {
       return out;
     }
 
+    let points = generatePoints(CURVES[0].fn);
+
     // Recomputes BOTH the backing-store size (with devicePixelRatio) and the
-    // chart geometry. The old version only resized the canvas, so the axes and
-    // curve stayed at their original coordinates after a window resize.
+    // chart geometry. The original only resized the canvas, so axes and curve
+    // kept their old coordinates after a window resize.
     function computeGeometry() {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
       const cssW = window.innerWidth;
@@ -362,8 +325,8 @@ function useCurveCanvas(canvasRef) {
       drawCurve(0, 1);
     }
 
-    // Time-based rather than frame-count based. The old `holdTime = 60` assumed
-    // 60fps, so the whole animation ran at double speed on a 120Hz display.
+    // Time-based, not frame-count based. The original `holdTime = 60` assumed
+    // 60fps, so everything ran at double speed on a 120Hz display.
     function frame(now) {
       const dt = lastTs === null ? 0 : Math.min(now - lastTs, 50);
       lastTs = now;
@@ -412,7 +375,7 @@ function useCurveCanvas(canvasRef) {
       }
     }
 
-    // Don't burn battery repainting a full-screen canvas in a hidden tab.
+    // Don't repaint a full-screen canvas in a hidden tab.
     const handleVisibility = () => (document.hidden ? stop() : start());
 
     const handleResize = () => {
@@ -434,7 +397,7 @@ function useCurveCanvas(canvasRef) {
     document.addEventListener('visibilitychange', handleVisibility);
     motionQuery.addEventListener('change', handleMotionChange);
 
-    // The original effect never cancelled its rAF loop, so React StrictMode's
+    // The original effect never cancelled its rAF loop, so StrictMode's
     // double-invoke left two loops fighting over the same canvas in dev.
     return () => {
       stop();
@@ -451,11 +414,14 @@ function useCurveCanvas(canvasRef) {
 
 function SkillTile({ name, icon }) {
   const [failed, setFailed] = useState(false);
-  const showImage = icon && !failed;
   return (
     <div className="flex flex-col items-center w-24">
       <div className="w-20 h-20 bg-slate-800/50 backdrop-blur-sm rounded-lg p-3 shadow-lg border border-cyan-500/30 transition-all duration-300 hover:scale-110 hover:shadow-2xl hover:shadow-cyan-500/40 hover:border-cyan-400 flex items-center justify-center">
-        {showImage ? (
+        {failed ? (
+          <span className="text-cyan-300 font-semibold text-xs text-center leading-tight">
+            {name}
+          </span>
+        ) : (
           <img
             src={icon}
             alt=""
@@ -465,14 +431,11 @@ function SkillTile({ name, icon }) {
             className="w-full h-full object-contain"
             onError={() => setFailed(true)}
           />
-        ) : (
-          // Fallback for skills with no icon asset, and for CDN failures.
-          <span className="text-cyan-300 font-semibold text-sm text-center leading-tight">
-            {name}
-          </span>
         )}
       </div>
-      <p className="mt-3 text-slate-300 font-medium text-sm text-center">{name}</p>
+      <p className="mt-3 text-slate-300 font-medium text-sm text-center leading-tight">
+        {name}
+      </p>
     </div>
   );
 }
@@ -531,6 +494,44 @@ function TimelineCard({ heading, link, title, meta, location, points, tags }) {
   );
 }
 
+function EmailLine() {
+  const [copied, setCopied] = useState(false);
+
+  // A bare mailto: link does nothing on machines with no default mail client
+  // registered, which is common on Windows. The copy button is the fallback.
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(EMAIL);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setCopied(false);
+    }
+  };
+
+  return (
+    <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
+      <a
+        href={`mailto:${EMAIL}`}
+        className="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-cyan-400/40 bg-cyan-500/10 text-cyan-200 hover:border-cyan-400 hover:text-cyan-100 transition-colors break-all"
+      >
+        <Mail size={18} aria-hidden="true" />
+        {EMAIL}
+      </a>
+      <button
+        type="button"
+        onClick={copy}
+        className="px-5 py-3 rounded-lg border border-cyan-400/40 text-cyan-300 hover:border-cyan-400 hover:bg-cyan-500/10 transition-colors text-sm font-medium"
+      >
+        {copied ? 'Copied' : 'Copy address'}
+      </button>
+      <span role="status" aria-live="polite" className="sr-only">
+        {copied ? 'Email address copied to clipboard' : ''}
+      </span>
+    </div>
+  );
+}
+
 function SectionHeading({ children }) {
   return (
     <h2 className="text-4xl font-bold text-center mb-14 text-white drop-shadow-lg">
@@ -544,57 +545,13 @@ function SectionHeading({ children }) {
 /* ------------------------------------------------------------------ */
 
 export default function Portfolio() {
-  const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: '',
-    website: '', // honeypot, hidden from humans
-  });
-  const [sending, setSending] = useState(false);
-  const [status, setStatus] = useState(null); // { type: 'success' | 'error', text }
   const canvasRef = useRef(null);
-
   useCurveCanvas(canvasRef);
 
-  const resumeUrl = `${import.meta.env.BASE_URL}resume.pdf`;
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-    if (formData.website) return; // bot filled the honeypot
-    if (sending) return;
-
-    setStatus(null);
-    setSending(true);
-    try {
-      await emailjs.send(
-        EMAILJS.serviceId,
-        EMAILJS.templateId,
-        {
-          from_name: formData.name,
-          from_email: formData.email,
-          message: formData.message,
-          reply_to: formData.email,
-        },
-        EMAILJS.publicKey
-      );
-      setStatus({ type: 'success', text: 'Thanks — your message is on its way. I usually reply within a couple of days.' });
-      setFormData({ name: '', email: '', message: '', website: '' });
-    } catch (error) {
-      console.error('EmailJS send failed:', error);
-      setStatus({
-        type: 'error',
-        text: `Something went wrong. Please email me directly at ${EMAIL}.`,
-      });
-    } finally {
-      setSending(false);
-    }
-  };
-
-  const inputClass =
-    'w-full px-6 py-4 bg-slate-800/50 text-white rounded-lg border border-cyan-500/30 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent placeholder-slate-400 backdrop-blur-sm disabled:opacity-60';
+  const resumeUrl = `${BASE}resume.pdf`;
 
   return (
-    // overflow-x-hidden instead of overflow-hidden: the latter silently breaks
+    // overflow-x-hidden, not overflow-hidden: the latter silently breaks
     // position:sticky for every descendant.
     <div className="min-h-screen text-white overflow-x-hidden relative bg-black">
       <canvas
@@ -630,6 +587,14 @@ export default function Portfolio() {
           </nav>
 
           <div className="flex items-center gap-5 shrink-0">
+            <a
+              href={`mailto:${EMAIL}`}
+              aria-label={`Email ${EMAIL}`}
+              title={EMAIL}
+              className="hover:text-cyan-400 transition-colors"
+            >
+              <Mail size={22} aria-hidden="true" />
+            </a>
             <a
               href={LINKEDIN}
               target="_blank"
@@ -667,65 +632,20 @@ export default function Portfolio() {
           <div className="max-w-6xl mx-auto w-full grid md:grid-cols-[1fr_auto] gap-12 items-center">
             <div>
               <p className="text-cyan-400 text-lg mb-3">Hello, I am</p>
-              <h1 className="text-6xl md:text-7xl font-bold mb-4 text-white drop-shadow-lg">
+              <h1 className="text-6xl md:text-7xl font-bold text-white drop-shadow-lg">
                 Jie Huang
               </h1>
-              <h2 className="text-2xl md:text-3xl text-cyan-300 mb-6 font-light">
-                Data Science &amp; Applied Statistics
-              </h2>
-
-              <p className="text-slate-200 text-base leading-relaxed max-w-xl mb-6">
-                I turn messy public and organizational data into things people can act on —
-                from healthcare access across 457 Massachusetts ZIP code areas, to AI search
-                over a 5,000-contact CRM. Currently pursuing an M.S. in Applied Statistics
-                and Data Science at Villanova.
-              </p>
-
-              <div className="flex flex-wrap gap-x-3 gap-y-2 text-sm text-slate-300 mb-8">
-                <span className="px-3 py-1 rounded-full border border-cyan-400/30 bg-cyan-500/10">
-                  Philadelphia, PA
-                </span>
-                <span className="px-3 py-1 rounded-full border border-cyan-400/30 bg-cyan-500/10">
-                  M.S. Villanova &apos;28
-                </span>
-                <span className="px-3 py-1 rounded-full border border-cyan-400/30 bg-cyan-500/10">
-                  B.S. Temple &apos;25
-                </span>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <a
-                  href={`mailto:${EMAIL}`}
-                  className="inline-flex items-center gap-2 px-7 py-3 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-lg transition-colors shadow-lg shadow-cyan-500/30"
-                >
-                  <Mail size={18} aria-hidden="true" />
-                  Email me
-                </a>
-                <a
-                  href={resumeUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 px-7 py-3 border border-cyan-400/50 text-cyan-300 hover:bg-cyan-500/10 hover:border-cyan-400 font-semibold rounded-lg transition-colors"
-                >
-                  <FileText size={18} aria-hidden="true" />
-                  View résumé
-                </a>
-              </div>
             </div>
 
             <div className="flex justify-center order-first md:order-last">
               <div className="w-64 h-64 md:w-80 md:h-80 rounded-full border-4 border-cyan-400 overflow-hidden shadow-2xl shadow-cyan-500/40">
                 <picture>
-                  <source
-                    srcSet={`${import.meta.env.BASE_URL}profile.webp`}
-                    type="image/webp"
-                  />
+                  <source srcSet={`${BASE}profile.webp`} type="image/webp" />
                   <img
-                    src={`${import.meta.env.BASE_URL}profile.jpg`}
+                    src={`${BASE}profile.jpg`}
                     alt="Jie Huang"
                     width="320"
                     height="320"
-                    fetchPriority="high"
                     className="w-full h-full object-cover"
                   />
                 </picture>
@@ -740,21 +660,14 @@ export default function Portfolio() {
             <SectionHeading>About</SectionHeading>
             <div className="space-y-5 text-slate-200 leading-relaxed">
               <p>
-                I immigrated from China to the U.S. during high school. Learning to navigate
-                a new language while keeping up in math and science taught me that technology
-                is one of the few things that translates cleanly across cultures — and it is
-                why I keep gravitating toward work where data serves people who are easy to
-                overlook.
+                Hi! I&apos;m Jie Huang (you can call me Jay). I recently graduated from
+                Temple University with a B.S. in Computer Science and Data Science. I
+                immigrated to the U.S. from China during high school, which shaped my
+                cross-cultural perspective on problem-solving in tech.
               </p>
-              <p>
-                That thread runs through most of what I have built: tax database systems for
-                600+ VITA clients in Philadelphia Chinatown, Salesforce pipelines for an
-                immigrant workforce nonprofit, and a study of how limited English proficiency
-                predicts uninsurance across Massachusetts. I work in both Chinese and English,
-                which has been less a line on a résumé than a practical requirement of
-                every one of those projects.
-              </p>
+              <p>Thank you for visiting my portfolio! Feel free to connect!</p>
             </div>
+            <EmailLine />
           </div>
         </section>
 
@@ -776,7 +689,10 @@ export default function Portfolio() {
                     <h4 className="text-base font-bold text-cyan-100">{edu.degree}</h4>
                     <p className="text-cyan-400 text-sm">{edu.period}</p>
                   </div>
-                  <p className="text-slate-300 text-sm mt-2">{edu.note}</p>
+                  <p className="text-slate-200 text-sm mt-2">
+                    <span className="text-slate-400">{edu.majorLabel}: </span>
+                    {edu.majors}
+                  </p>
                 </div>
               ))}
             </div>
@@ -785,20 +701,13 @@ export default function Portfolio() {
 
         {/* Skills */}
         <section id="skills" className="py-20 px-6">
-          <div className="max-w-4xl mx-auto">
+          {/* Wider than other sections so all nine tiles fit on one line at
+              desktop widths; still wraps gracefully on narrow screens. */}
+          <div className="max-w-5xl mx-auto">
             <SectionHeading>Skills</SectionHeading>
-            <div className="space-y-12">
-              {SKILL_GROUPS.map((group) => (
-                <div key={group.label}>
-                  <h3 className="text-center text-sm uppercase tracking-[0.2em] text-cyan-400 mb-7">
-                    {group.label}
-                  </h3>
-                  <div className="flex flex-wrap justify-center gap-6">
-                    {group.items.map((skill) => (
-                      <SkillTile key={skill.name} {...skill} />
-                    ))}
-                  </div>
-                </div>
+            <div className="flex flex-wrap justify-center items-start gap-4">
+              {SKILLS.map((skill) => (
+                <SkillTile key={skill.name} {...skill} />
               ))}
             </div>
           </div>
@@ -843,113 +752,6 @@ export default function Portfolio() {
                 />
               ))}
             </div>
-          </div>
-        </section>
-
-        {/* Contact */}
-        <section id="contact" className="py-20 px-6">
-          <div className="max-w-3xl mx-auto">
-            <SectionHeading>Contact</SectionHeading>
-
-            <p className="text-center text-slate-200 mb-10">
-              The fastest way to reach me is email:{' '}
-              <a
-                href={`mailto:${EMAIL}`}
-                className="text-cyan-300 underline decoration-cyan-400/40 underline-offset-4 hover:text-cyan-200 break-words"
-              >
-                {EMAIL}
-              </a>
-            </p>
-
-            <form onSubmit={handleSubmit} className="space-y-6" noValidate={false}>
-              <div>
-                <label htmlFor="name" className="sr-only">
-                  Your name
-                </label>
-                <input
-                  id="name"
-                  name="name"
-                  type="text"
-                  required
-                  autoComplete="name"
-                  placeholder="Name"
-                  value={formData.name}
-                  disabled={sending}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="email" className="sr-only">
-                  Your email address
-                </label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  required
-                  autoComplete="email"
-                  placeholder="Email address"
-                  value={formData.email}
-                  disabled={sending}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className={inputClass}
-                />
-              </div>
-
-              <div>
-                <label htmlFor="message" className="sr-only">
-                  Your message
-                </label>
-                <textarea
-                  id="message"
-                  name="message"
-                  required
-                  rows={6}
-                  placeholder="Message"
-                  value={formData.message}
-                  disabled={sending}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                  className={`${inputClass} resize-none`}
-                />
-              </div>
-
-              {/* Honeypot: hidden from people, irresistible to bots. */}
-              <div className="hidden" aria-hidden="true">
-                <label htmlFor="website">Leave this field empty</label>
-                <input
-                  id="website"
-                  name="website"
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  value={formData.website}
-                  onChange={(e) => setFormData({ ...formData, website: e.target.value })}
-                />
-              </div>
-
-              <div className="text-center">
-                <button
-                  type="submit"
-                  disabled={sending}
-                  className="px-12 py-4 bg-cyan-500 hover:bg-cyan-400 text-slate-900 font-semibold rounded-lg transition-all duration-300 shadow-lg shadow-cyan-500/40 disabled:opacity-60 disabled:cursor-not-allowed disabled:hover:bg-cyan-500"
-                >
-                  {sending ? 'Sending…' : 'Send message'}
-                </button>
-              </div>
-
-              {/* Inline status replaces the old alert() popups. */}
-              <p
-                role="status"
-                aria-live="polite"
-                className={`text-center text-sm min-h-[1.25rem] ${
-                  status?.type === 'error' ? 'text-red-300' : 'text-cyan-300'
-                }`}
-              >
-                {status?.text ?? ''}
-              </p>
-            </form>
           </div>
         </section>
 
