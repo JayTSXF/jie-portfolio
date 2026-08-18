@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Github, Linkedin, FileText, ExternalLink, Mail } from 'lucide-react';
+import { Github, Linkedin, FileText, ExternalLink, Mail, Check } from 'lucide-react';
 
 /* ------------------------------------------------------------------ */
 /*  Config                                                             */
@@ -497,37 +497,49 @@ function TimelineCard({ heading, link, title, meta, location, points, tags }) {
 function EmailLine() {
   const [copied, setCopied] = useState(false);
 
-  // A bare mailto: link does nothing on machines with no default mail client
-  // registered, which is common on Windows. The copy button is the fallback.
   const copy = async () => {
     try {
       await navigator.clipboard.writeText(EMAIL);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
     } catch {
-      setCopied(false);
+      // navigator.clipboard needs a secure context (https or localhost).
+      // Fall back to the legacy path so the button still works elsewhere.
+      const field = document.createElement('textarea');
+      field.value = EMAIL;
+      field.setAttribute('readonly', '');
+      field.style.position = 'absolute';
+      field.style.left = '-9999px';
+      document.body.appendChild(field);
+      field.select();
+      try {
+        document.execCommand('copy');
+      } catch {
+        /* nothing else to try; the address is visible on screen anyway */
+      }
+      document.body.removeChild(field);
     }
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   return (
-    <div className="mt-10 flex flex-wrap items-center justify-center gap-3">
-      <a
-        href={`mailto:${EMAIL}`}
-        className="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-cyan-400/40 bg-cyan-500/10 text-cyan-200 hover:border-cyan-400 hover:text-cyan-100 transition-colors break-all"
-      >
-        <Mail size={18} aria-hidden="true" />
-        {EMAIL}
-      </a>
+    <div className="mt-10 flex flex-col items-center">
       <button
         type="button"
         onClick={copy}
-        className="px-5 py-3 rounded-lg border border-cyan-400/40 text-cyan-300 hover:border-cyan-400 hover:bg-cyan-500/10 transition-colors text-sm font-medium"
+        aria-label={`Copy email address ${EMAIL}`}
+        className="inline-flex items-center gap-2 px-5 py-3 rounded-lg border border-cyan-400/40 bg-cyan-500/10 text-cyan-200 hover:border-cyan-400 hover:text-cyan-100 transition-colors break-all"
       >
-        {copied ? 'Copied' : 'Copy address'}
+        {copied ? (
+          <Check size={18} aria-hidden="true" />
+        ) : (
+          <Mail size={18} aria-hidden="true" />
+        )}
+        {EMAIL}
       </button>
-      <span role="status" aria-live="polite" className="sr-only">
-        {copied ? 'Email address copied to clipboard' : ''}
-      </span>
+      {/* Fixed height so the layout doesn't shift when the message appears. */}
+      <p role="status" aria-live="polite" className="mt-2 h-5 text-sm text-cyan-400">
+        {copied ? 'Copied to clipboard' : ''}
+      </p>
     </div>
   );
 }
@@ -587,14 +599,6 @@ export default function Portfolio() {
           </nav>
 
           <div className="flex items-center gap-5 shrink-0">
-            <a
-              href={`mailto:${EMAIL}`}
-              aria-label={`Email ${EMAIL}`}
-              title={EMAIL}
-              className="hover:text-cyan-400 transition-colors"
-            >
-              <Mail size={22} aria-hidden="true" />
-            </a>
             <a
               href={LINKEDIN}
               target="_blank"
@@ -660,8 +664,9 @@ export default function Portfolio() {
             <SectionHeading>About</SectionHeading>
             <div className="space-y-5 text-slate-200 leading-relaxed">
               <p>
-                Hi! I&apos;m Jie Huang (you can call me Jay). I recently graduated from
-                Temple University with a B.S. in Computer Science and Data Science. I
+                Hi! I&apos;m Jie Huang (you can call me Jay). I graduated from Temple
+                University with a B.S. in Computer Science and Data Science, and I&apos;m now
+                pursuing an M.S. in Applied Statistics and Data Science at Villanova. I
                 immigrated to the U.S. from China during high school, which shaped my
                 cross-cultural perspective on problem-solving in tech.
               </p>
